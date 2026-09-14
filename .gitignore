@@ -10,6 +10,9 @@ wheels/
 /trips.json
 /trips.json.*.tmp
 
+/logs/
+
+
 # Virtual environments
 .venv
 

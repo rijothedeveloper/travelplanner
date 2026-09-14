@@ -12,7 +12,7 @@ class ActivityCreate(BaseModel):
 
     title: str = Field(min_length=1, max_length=100)
     activity_date: date
-    cost_cents: int = Field(ge=0, strict=True)
+    cost_cents: int = Field(ge=0, le=9_223_372_036_854_775_807, strict=True)
 
 
 class Activity(ActivityCreate):
@@ -25,8 +25,8 @@ class TripCreate(BaseModel):
     start_date: date
     end_date: date
     destination: str = Field(min_length=1, max_length=100)
-    travelers: int = Field(ge=1, strict=True)
-    budget_cents: int = Field(ge=0, strict=True)
+    travelers: int = Field(ge=1, le=2_147_483_647, strict=True)
+    budget_cents: int = Field(ge=0, le=9_223_372_036_854_775_807, strict=True)
 
     @model_validator(mode="after")
     def check_dates(self) -> Self:
@@ -38,3 +38,6 @@ class TripCreate(BaseModel):
 class Trip(TripCreate):
     id: UUID
     activities: list[Activity] = Field(default_factory=list)
+
+class TripSummary(TripCreate):
+    id: UUID
