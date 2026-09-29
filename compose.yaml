@@ -1,0 +1,21 @@
+
+
+services:
+
+  api:
+    image: travel-planner:lesson6
+    pull_policy: never
+    env_file:
+      - .env
+    environment:
+      TRAVEL_JWT_SECRET: "${TRAVEL_JWT_SECRET:?Export your existing TRAVEL_JWT_SECRET}"
+    ports:
+      - "127.0.0.1:8085:8000"
+
+  worker:
+    image: travel-planner:lesson6
+    pull_policy: never
+    command: [ "python", "-m", "worker" ]
+    env_file:
+      - .env
+

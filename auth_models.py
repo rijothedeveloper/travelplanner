@@ -1,3 +1,4 @@
+from typing import Literal
 from uuid import UUID
 
 from pydantic import (
@@ -25,3 +26,19 @@ class UserCreate(BaseModel):
 class UserPublic(BaseModel):
     id: UUID
     email: EmailStr
+
+class UserLogin(UserCreate):
+    password: SecretStr = Field(
+        min_length=1,
+        max_length=128,
+        strict=True,
+    )
+
+
+class UserCredentials(UserPublic):
+    password_hash: SecretStr
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: Literal["bearer"] = "bearer"

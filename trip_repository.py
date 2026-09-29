@@ -66,19 +66,20 @@ def _trips_from_rows(rows: list[dict[str, Any]]) -> list[Trip]:
     return list(trips_by_id.values())
 
 
-def create_trip(payload: TripCreate) -> Trip:
+def create_trip(payload: TripCreate, *, owner_id: UUID) -> Trip:
     with connect_db() as connection:
         row = connection.execute(
             """
             INSERT INTO trips (
-                title, destination, start_date, end_date,
+                owner_id, title, destination, start_date, end_date,
                 travelers, budget_cents
             )
-            VALUES (%s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
             RETURNING id, title, destination, start_date, end_date,
                       travelers, budget_cents
             """,
             (
+                owner_id,
                 payload.title,
                 payload.destination,
                 payload.start_date,
@@ -93,11 +94,13 @@ def create_trip(payload: TripCreate) -> Trip:
     return trip
 
 
-def list_trips() -> list[Trip]:
+def list_trips(*, owner_id: UUID) -> list[Trip]:
     with connect_db() as connection:
         rows = connection.execute(
             _TRIPS_SQL
-            + " ORDER BY t.start_date, t.id, a.activity_date, a.id"
+            + " WHERE t.owner_id = %s"
+            + " ORDER BY t.start_date, t.id, a.activity_date, a.id",
+            (owner_id,),
         ).fetchall()
 
         trips = _trips_from_rows(rows)
@@ -105,12 +108,13 @@ def list_trips() -> list[Trip]:
     return trips
 
 
-def get_trip(trip_id: UUID) -> Trip | None:
+def get_trip(trip_id: UUID, *, owner_id: UUID) -> Trip | None:
     with connect_db() as connection:
         rows = connection.execute(
             _TRIPS_SQL
-            + " WHERE t.id = %s ORDER BY a.activity_date, a.id",
-            (trip_id,),
+            + " WHERE t.id = %s AND t.owner_id = %s"
+            + " ORDER BY a.activity_date, a.id",
+            (trip_id, owner_id),
         ).fetchall()
 
         trips = _trips_from_rows(rows)
@@ -118,12 +122,12 @@ def get_trip(trip_id: UUID) -> Trip | None:
     return trips[0] if trips else None
 
 
-def count_trips() -> int:
+def count_trips(*, owner_id: UUID) -> int:
     with connect_db() as connection:
         row = connection.execute(
-            "SELECT COUNT(*) AS count FROM trips"
+            "SELECT COUNT(*) AS count FROM trips WHERE owner_id = %s",
+            (owner_id,),
         ).fetchone()
-
         assert row is not None
         count = row["count"]
 
@@ -133,16 +137,18 @@ def count_trips() -> int:
 def add_activity(
     trip_id: UUID,
     payload: ActivityCreate,
+    *,
+    owner_id: UUID,
 ) -> Activity:
     with connect_db() as connection:
         trip = connection.execute(
             """
             SELECT start_date, end_date
             FROM trips
-            WHERE id = %s
+            WHERE id = %s AND owner_id = %s
             FOR UPDATE
             """,
-            (trip_id,),
+            (trip_id, owner_id),
         ).fetchone()
 
         if trip is None:
@@ -153,18 +159,11 @@ def add_activity(
 
         row = connection.execute(
             """
-            INSERT INTO activities (
-                trip_id, title, activity_date, cost_cents
-            )
+            INSERT INTO activities (trip_id, title, activity_date, cost_cents)
             VALUES (%s, %s, %s, %s)
             RETURNING id, title, activity_date, cost_cents
             """,
-            (
-                trip_id,
-                payload.title,
-                payload.activity_date,
-                payload.cost_cents,
-            ),
+            (trip_id, payload.title, payload.activity_date, payload.cost_cents),
         ).fetchone()
 
         activity = Activity.model_validate(row)
@@ -172,16 +171,21 @@ def add_activity(
     return activity
 
 
-def delete_activity(trip_id: UUID, activity_id: UUID) -> None:
+def delete_activity(
+    trip_id: UUID,
+    activity_id: UUID,
+    *,
+    owner_id: UUID,
+) -> None:
     with connect_db() as connection:
         trip = connection.execute(
             """
             SELECT id
             FROM trips
-            WHERE id = %s
+            WHERE id = %s AND owner_id = %s
             FOR UPDATE
             """,
-            (trip_id,),
+            (trip_id, owner_id),
         ).fetchone()
 
         if trip is None:

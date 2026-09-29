@@ -1,0 +1,67 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #18332f;
+  background: #f5f4ee;
+  line-height: 1.5;
+  --accent: #176557;
+  --border: #d6ded7;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; }
+.page-header, main, footer { max-width: 1120px; margin: auto; padding: 24px; }
+.page-header { display: flex; justify-content: space-between; gap: 24px; padding-top: 48px; }
+h1, h2, h3, p { margin-top: 0; }
+h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); letter-spacing: -0.04em; margin-bottom: 8px; }
+h2 { font-size: 1.4rem; margin-bottom: 14px; }
+h3 { margin-top: 28px; }
+.eyebrow { color: var(--accent); font-size: .72rem; font-weight: 750; letter-spacing: .12em; }
+.card { background: #fffefa; border: 1px solid var(--border); border-radius: 18px; padding: 24px; }
+.auth-card { max-width: 440px; margin: 0 auto; }
+.workspace { display: grid; grid-template-columns: minmax(0, 350px) minmax(0, 1fr); gap: 24px; align-items: start; }
+.sidebar { display: grid; gap: 24px; }
+.detail-card { min-height: 340px; }
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+label { display: block; font-size: .86rem; font-weight: 650; margin-bottom: 6px; }
+input, button { font: inherit; }
+input { width: 100%; min-width: 0; padding: 10px 12px; border: 1px solid #aebdb4; border-radius: 8px; margin-bottom: 16px; background: white; color: inherit; }
+button { border: 1px solid transparent; border-radius: 8px; background: var(--accent); color: white; padding: 10px 16px; cursor: pointer; font-weight: 650; }
+button:hover { filter: brightness(.93); }
+button:disabled { opacity: .6; cursor: wait; }
+input:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 3px solid #d48638; outline-offset: 3px; }
+form button[type="submit"] { width: 100%; }
+.secondary { background: #edf3ee; border-color: var(--border); color: #18332f; }
+.text-button { color: var(--accent); background: transparent; padding-left: 0; margin-top: 12px; }
+.form-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.section-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.section-header h2 { margin: 0; }
+.item-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.trip-button { width: 100%; background: #f5f7f2; color: inherit; border: 1px solid var(--border); text-align: left; }
+.trip-button[aria-pressed="true"] { background: #e1efe7; border-color: var(--accent); }
+.activity-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; border-bottom: 1px solid var(--border); padding: 12px 0; }
+.activity-row small { display: block; margin-top: 4px; color: #52665f; }
+.activity-row button { background: transparent; color: #9e3425; border-color: #dfc4bc; flex-shrink: 0; }
+.budget-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 28px; }
+.budget-grid div { background: #eef3ed; border-radius: 10px; padding: 16px; }
+dt { color: #52665f; font-size: .8rem; }
+dd { margin: 6px 0 0; font-weight: 750; font-size: 1.15rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.negative { color: #a22f20; }
+.muted, footer { color: #52665f; font-size: .85rem; }
+#status { min-height: 1.5em; overflow-wrap: anywhere; }
+#status[data-error="true"] { color: #a22f20; }
+#account, #selected-title, #selected-meta, .item-list { overflow-wrap: anywhere; }
+#account { text-align: right; }
+footer { text-align: center; margin-top: 24px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+@media (max-width: 760px) {
+  .workspace { grid-template-columns: minmax(0, 1fr); }
+  .page-header { flex-direction: column; padding-top: 28px; }
+  #account { text-align: left; }
+  .page-header, main, footer { padding-left: 16px; padding-right: 16px; }
+  .card { padding: 20px; }
+  .budget-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 380px) {
+  .form-row { grid-template-columns: minmax(0, 1fr); gap: 0; }
+}
+
